@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class SceneRender {
     private final ShaderProgram shaderProgram;
+    private final UniformsMap uniformsMap;
 
     public SceneRender() {
         ImmutableList<ShaderModuleData> shaderModuleDataList = Lists.immutable.of(
@@ -19,15 +20,22 @@ public final class SceneRender {
         );
 
         shaderProgram = new ShaderProgram(shaderModuleDataList);
+        uniformsMap = new UniformsMap(shaderProgram.getProgramId());
+        createUniforms();
     }
 
     public void render(Scene scene) {
         shaderProgram.bind();
 
-        scene.getMeshMap().forEachValue(mesh -> {
+        uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjectionMatrix());
+
+        scene.getModelMap().forEachValue(model -> model.meshes().forEach(mesh -> {
             glBindVertexArray(mesh.vaoId());
-            glDrawElements(GL_TRIANGLES, mesh.numVertices(), GL_UNSIGNED_INT, 0);
-        });
+            model.entities().forEach(entity -> {
+                uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
+                glDrawElements(GL_TRIANGLES, mesh.numVertices(), GL_UNSIGNED_INT, 0);
+            });
+        }));
 
         glBindVertexArray(0);
 
@@ -36,5 +44,10 @@ public final class SceneRender {
 
     public void cleanup() {
         shaderProgram.cleanup();
+    }
+
+    private void createUniforms() {
+        uniformsMap.createUniform("projectionMatrix");
+        uniformsMap.createUniform("modelMatrix");
     }
 }

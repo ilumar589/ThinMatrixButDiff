@@ -22,7 +22,7 @@ public final class Engine {
         targetUps = windowOptions.ups();
         this.appLogic = appLogic;
         this.render = new Render();
-        this.scene = new Scene();
+        this.scene = new Scene(windowOptions.width(), windowOptions.height());
 
         appLogic.init(window, scene, render);
         running = true;
