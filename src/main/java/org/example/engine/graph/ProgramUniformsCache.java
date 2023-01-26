@@ -3,14 +3,13 @@ package org.example.engine.graph;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.joml.Matrix4f;
 
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.*;
 
-public final class UniformsMap {
+public final class ProgramUniformsCache {
     private final int programId;
     private final UnifiedMap<String, Integer> uniforms;
 
-    public UniformsMap(int programId) {
+    public ProgramUniformsCache(int programId) {
         this.programId = programId;
         uniforms = new UnifiedMap<>();
     }
@@ -25,10 +24,19 @@ public final class UniformsMap {
     }
 
     public void setUniform(String uniformName, Matrix4f value) {
-        int location = uniforms.getOrDefault(uniformName, -99);
-        if (location == -99) {
-            throw new RuntimeException("Could not find uniform [" + uniformName + "]");
+        glUniformMatrix4fv(getUniformLocation(uniformName), false, value.get(new float[16]));
+    }
+
+    public void setUniform(String uniformName, int value) {
+        glUniform1i(getUniformLocation(uniformName), value);
+    }
+
+    private int getUniformLocation(String uniformName) {
+        Integer location = uniforms.get(uniformName);
+        if (location == null) {
+            throw new RuntimeException("Could not find uniforms [" + uniformName + "]");
         }
-        glUniformMatrix4fv(location, false, value.get(new float[16]));
+
+        return location;
     }
 }

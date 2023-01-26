@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public record Mesh(int numVertices, int vaoId, ImmutableIntList vboIdList) {
-    public void cleanup() {
+    public void cleanUp() {
         vboIdList.forEach(GL30::glDeleteBuffers);
         glDeleteVertexArrays(vaoId);
     }

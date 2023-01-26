@@ -2,16 +2,22 @@ package org.example.engine.graph;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
+import org.example.engine.scene.Entity;
 import org.example.engine.scene.Scene;
 
+import java.util.Collection;
+
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class SceneRender {
     private final ShaderProgram shaderProgram;
-    private final UniformsMap uniformsMap;
+    private final ProgramUniformsCache programUniformsCache;
 
     public SceneRender() {
         ImmutableList<ShaderModuleData> shaderModuleDataList = Lists.immutable.of(
@@ -20,22 +26,34 @@ public final class SceneRender {
         );
 
         shaderProgram = new ShaderProgram(shaderModuleDataList);
-        uniformsMap = new UniformsMap(shaderProgram.getProgramId());
-        createUniforms();
+        programUniformsCache = createUniforms();
     }
 
     public void render(Scene scene) {
         shaderProgram.bind();
 
-        uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjectionMatrix());
+        programUniformsCache.setUniform("projectionMatrix", scene.getProjection().getProjectionMatrix());
+        programUniformsCache.setUniform("txtSampler", 0);
 
-        scene.getModelMap().forEachValue(model -> model.meshes().forEach(mesh -> {
-            glBindVertexArray(mesh.vaoId());
-            model.entities().forEach(entity -> {
-                uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
-                glDrawElements(GL_TRIANGLES, mesh.numVertices(), GL_UNSIGNED_INT, 0);
+        TextureCache textureCache = scene.getTextureCache();
+
+        scene.getModelMap().forEachValue(model -> {
+            MutableList<Entity> entities = model.entities();
+
+            model.materials().forEach(material -> {
+                Texture texture = textureCache.getTexture(material.texturePath());
+                glActiveTexture(GL_TEXTURE0);
+                texture.bind();
+
+                material.meshes().forEach(mesh -> {
+                    glBindVertexArray(mesh.vaoId());
+                    entities.forEach(entity -> {
+                        programUniformsCache.setUniform("modelMatrix", entity.getModelMatrix());
+                        glDrawElements(GL_TRIANGLES, mesh.numVertices(), GL_UNSIGNED_INT, 0);
+                    });
+                });
             });
-        }));
+        });
 
         glBindVertexArray(0);
 
@@ -43,11 +61,15 @@ public final class SceneRender {
     }
 
     public void cleanup() {
-        shaderProgram.cleanup();
+        shaderProgram.cleanUp();
     }
 
-    private void createUniforms() {
-        uniformsMap.createUniform("projectionMatrix");
-        uniformsMap.createUniform("modelMatrix");
+    private ProgramUniformsCache createUniforms() {
+        ProgramUniformsCache programUniformsCacheRef = new ProgramUniformsCache(shaderProgram.getProgramId());
+        programUniformsCacheRef.createUniform("projectionMatrix");
+        programUniformsCacheRef.createUniform("modelMatrix");
+        programUniformsCacheRef.createUniform("txtSampler");
+
+        return programUniformsCache;
     }
 }

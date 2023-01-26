@@ -6,25 +6,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public final class ResourceLoader {
-    private static final String SHADER_LOCATION_PREFIX = "/assets/shaders/";
-    private static final String SHADER_EXTENSION = ".glsl";
 
-    private ResourceLoader() {}
+    private ResourceLoader() {
+    }
 
-    public static String loadShader(String shaderName) {
+    public static String loadShader(String shaderPath) {
         StringBuilder builder = new StringBuilder();
 
-        try(InputStream in = ResourceLoader
-                .class
-                .getResourceAsStream(SHADER_LOCATION_PREFIX.concat(shaderName).concat(SHADER_EXTENSION))) {
+        try (InputStream in = ResourceLoader.class.getResourceAsStream(shaderPath)) {
             assert in != null;
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
                     builder.append(line).append("\n");
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());

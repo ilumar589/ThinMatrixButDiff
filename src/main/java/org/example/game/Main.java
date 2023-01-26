@@ -20,6 +20,7 @@ public class Main implements IAppLogic {
     private Entity cubeEntity;
     private Vector4f displInc = new Vector4f();
     private float rotation;
+    private float speed = 400;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -114,12 +115,13 @@ public class Main implements IAppLogic {
             displInc.w = 1;
         }
 
-        displInc.mul(diffTimeMillis / 1000.0f);
+        displInc.mul(diffTimeMillis / 1000.0f).mul(speed);
 
         Vector3f entityPos = cubeEntity.getPosition();
         cubeEntity.setPosition(displInc.x + entityPos.x, displInc.y + entityPos.y, displInc.z + entityPos.z);
         cubeEntity.setScale(cubeEntity.getScale() + displInc.w);
         cubeEntity.updateModelMatrix();
+
     }
 
     @Override

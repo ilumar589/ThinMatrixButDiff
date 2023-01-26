@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 public final class Entity {
     private final String id;
+    /* reference back to the model containing the entity. Model has multiple entities */
     private final String modelId;
     private final Matrix4f modelMatrix;
     private final Vector3f position;
