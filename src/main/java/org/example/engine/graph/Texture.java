@@ -26,7 +26,7 @@ public record Texture(int textureId, String texturePath) {
             throw new RuntimeException("Image file [" + texturePath + "] not loaded: " + stbi_failure_reason());
         }
 
-        int generatedTextureId = generateTexture(w[0], h[0], textureReference);
+        int generatedTextureId = storeTextureToGpu(w[0], h[0], textureReference);
 
         stbi_image_free(textureReference);
 
@@ -41,7 +41,7 @@ public record Texture(int textureId, String texturePath) {
      * @param textureReference
      * @return generated texture reference as an int value
      */
-    private static int generateTexture(int width, int height, ByteBuffer textureReference) {
+    private static int storeTextureToGpu(int width, int height, ByteBuffer textureReference) {
         int textureId = glGenTextures();
 
         glBindTexture(GL_TEXTURE_2D, textureId);

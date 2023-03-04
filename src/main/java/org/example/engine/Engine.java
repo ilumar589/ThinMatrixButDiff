@@ -40,7 +40,7 @@ public final class Engine {
     private void run() {
         long initialTime = System.currentTimeMillis();
         float timeU = 1000.0f / targetUps;
-        float timeR = targetFps > 0 ? 1000.0f / targetFps : 0;
+        float timeR = 1000.0f / targetFps;
         float deltaUpdate = 0;
         float deltaFps = 0;
 

@@ -7,7 +7,7 @@ import org.example.utils.ResourceLoader;
 import static org.lwjgl.opengl.GL20C.*;
 
 public final class ShaderProgram {
-    private static final String SHADER_LOCATION_PREFIX = "/assets/shaders/";
+    private static final String SHADER_LOCATION_PREFIX = "resources/assets/shaders/";
     private static final String SHADER_EXTENSION = ".glsl";
     private final int programId;
 
@@ -20,7 +20,7 @@ public final class ShaderProgram {
         ImmutableIntList shaderIds = shaderModuleDataList
                 .collectInt(shaderModuleData ->
                         createShader(ResourceLoader
-                                .loadShader(SHADER_LOCATION_PREFIX
+                                .readFile(SHADER_LOCATION_PREFIX
                                         .concat(shaderModuleData.shaderName())
                                         .concat(SHADER_EXTENSION)),
                                 shaderModuleData.shaderType()));

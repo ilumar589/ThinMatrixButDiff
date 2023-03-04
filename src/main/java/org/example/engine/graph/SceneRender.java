@@ -6,8 +6,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.example.engine.scene.Entity;
 import org.example.engine.scene.Scene;
 
-import java.util.Collection;
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -38,10 +36,10 @@ public final class SceneRender {
         TextureCache textureCache = scene.getTextureCache();
 
         scene.getModelMap().forEachValue(model -> {
-            MutableList<Entity> entities = model.entities();
+            ImmutableList<Entity> entities = model.entities();
 
             model.materials().forEach(material -> {
-                Texture texture = textureCache.getTexture(material.texturePath());
+                Texture texture = textureCache.getOrCreateTexture(material.texturePath());
                 glActiveTexture(GL_TEXTURE0);
                 texture.bind();
 
@@ -70,6 +68,6 @@ public final class SceneRender {
         programUniformsCacheRef.createUniform("modelMatrix");
         programUniformsCacheRef.createUniform("txtSampler");
 
-        return programUniformsCache;
+        return programUniformsCacheRef;
     }
 }

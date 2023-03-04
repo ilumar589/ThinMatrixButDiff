@@ -1,13 +1,8 @@
 package org.example.engine.graph;
 
-import org.eclipse.collections.api.factory.Lists;
-import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.list.ImmutableList;
 
-public record Material(String texturePath, MutableList<Mesh> meshes) {
-    public Material(String texturePath) {
-        this(texturePath, Lists.mutable.empty());
-    }
-
+public record Material(String texturePath, ImmutableList<Mesh> meshes) {
     public void cleanUp() {
         meshes.forEach(Mesh::cleanUp);
     }

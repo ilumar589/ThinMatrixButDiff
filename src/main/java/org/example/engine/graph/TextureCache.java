@@ -1,10 +1,11 @@
 package org.example.engine.graph;
 
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.example.utils.ResourceLoader;
 
 public final class TextureCache {
-    public static final String DEFAULT_TEXTURE = "/models/default/default_texture.png";
-    private UnifiedMap<String, Texture> textureMap;
+    public static final String DEFAULT_TEXTURE = "resources/assets/models/default/default_texture.png";
+    private final UnifiedMap<String, Texture> textureMap;
 
     public TextureCache() {
         textureMap = UnifiedMap.newMap();
@@ -15,11 +16,11 @@ public final class TextureCache {
         textureMap.values().forEach(Texture::cleanup);
     }
 
-    public Texture getTexture(String texturePath) {
+    public Texture getOrCreateTexture(String texturePath) {
         if (texturePath == null || texturePath.isEmpty()) {
             return textureMap.get(DEFAULT_TEXTURE);
         }
 
-        return textureMap.get(texturePath);
+        return textureMap.getIfAbsentPut(texturePath, Texture.createTexture(texturePath));
     }
 }

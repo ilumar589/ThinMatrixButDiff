@@ -15,16 +15,6 @@ public final class Scene {
         textureCache = new TextureCache();
     }
 
-    public void addEntity(Entity entity) {
-        String modelId = entity.getModelId();
-        Model model = modelMap.get(modelId);
-        if (model == null) {
-            throw new RuntimeException("Could not find model [" + modelId + "]");
-        }
-
-        model.entities().add(entity);
-    }
-
     public void addModel(Model model) {
         modelMap.put(model.id(), model);
     }

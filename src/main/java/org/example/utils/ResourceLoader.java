@@ -1,31 +1,21 @@
 package org.example.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public final class ResourceLoader {
 
     private ResourceLoader() {
     }
 
-    public static String loadShader(String shaderPath) {
-        StringBuilder builder = new StringBuilder();
-
-        try (InputStream in = ResourceLoader.class.getResourceAsStream(shaderPath)) {
-            assert in != null;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line).append("\n");
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+    public static String readFile(String filePath) {
+        String str;
+        try {
+            str = new String(Files.readAllBytes(Paths.get(filePath)));
+        } catch (IOException excp) {
+            throw new RuntimeException("Error reading file [" + filePath + "]", excp);
         }
-
-        return builder.toString();
+        return str;
     }
 }
